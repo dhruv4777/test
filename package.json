@@ -1,0 +1,20 @@
+{
+  "name": "cicd-sample-html-css-js",
+  "version": "1.0.0",
+  "description": "Sample HTML/CSS/JS project equipped with GitHub Actions automated build and test pipeline",
+  "main": "js/app.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "build": "node scripts/build.js"
+  },
+  "keywords": [
+    "html",
+    "css",
+    "javascript",
+    "github-actions",
+    "ci-cd"
+  ],
+  "author": "Developer",
+  "license": "MIT"
+}
