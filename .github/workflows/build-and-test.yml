@@ -1,4 +1,4 @@
-name: Build and Test
+name: Build, Test, and Deploy to GitHub Pages
 
 on:
   push:
@@ -6,7 +6,19 @@ on:
   pull_request:
     branches: [ "main", "master" ]
 
+# Grant required permissions for GitHub Pages deployment
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
+  # Job 1: Run unit tests and build static distribution
   build-and-test:
     runs-on: ubuntu-latest
 
@@ -19,7 +31,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install Node.js dependencies
+      - name: Install dependencies
         run: npm install
 
       - name: Run automated unit tests
@@ -27,3 +39,26 @@ jobs:
 
       - name: Run build process
         run: npm run build
+
+      - name: Setup GitHub Pages configuration
+        uses: actions/configure-pages@v5
+
+      - name: Upload static artifact for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './dist'
+
+  # Job 2: Deploy to GitHub Pages (runs after build-and-test passes on push to main/master)
+  deploy:
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
+    needs: build-and-test
+    runs-on: ubuntu-latest
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
